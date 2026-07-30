@@ -4,6 +4,9 @@ Setting up
 npm init -y 
 npm install express
 npm install -D nodemon
+npm install mongoose
+npm install -D dotenv
+
 
 The server.js is the entry point of the API
 set "dev": "nodemon server.js"
