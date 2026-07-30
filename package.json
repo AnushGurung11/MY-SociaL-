@@ -2,13 +2,15 @@
   "name": "my-social",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "devDependencies": {
+    "chai": "^6.2.2",
     "dotenv": "^17.4.2",
+    "mocha": "^11.7.6",
     "nodemon": "^3.1.14"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "dev": "nodemon server.js"
   },
   "keywords": [],
