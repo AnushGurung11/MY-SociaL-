@@ -1,0 +1,15 @@
+Setting up
+
+
+npm init -y 
+npm install express
+npm install -D nodemon
+
+The server.js is the entry point of the API
+set "dev": "nodemon server.js"
+
+Change the commonjs type to module, as we can write code in python sytle
+
+.env file is to be created for keeping the credentials 
+
+
