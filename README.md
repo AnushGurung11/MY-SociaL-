@@ -111,22 +111,21 @@ Following **Model-View-Controller**, adapted for an API-only backend:
 ## Routes Used
 
 **User**
-
-`/auth/login` POST method for logging in 
-`/auth/register` POST method for register
-`/users/:id` DELETE method for user to delete their account
-`/users/:id/ban` PATCH method for admin only to ban the account (Partial Update)
+- `/auth/login`- POST method for logging in 
+- `/auth/register`- POST method for register
+- `/users/:id`- DELETE method for user to delete their account
+- `/users/:id/ban`- PATCH method for admin only to ban the account (Partial Update)
 
 **Post**
-`/posts` GET method of feed
-`/posts/:id` GET method for single post made
-`/posts` POST method for creating new post
-`/posts/:id`DELETE method for deleting the post
+- `/posts`- GET method of feed
+- `/posts/:id`- GET method for single post made
+- `/posts`- POST method for creating new post
+- `/posts/:id`- DELETE method for deleting the post
 
 **Comment**
-`/posts/:postId/comments` GET all comments of that Post
-`/posts/:postId/comments` POST method for commenting on a Post
-`/comment/:id`DELETE method for deleting the comment
+- `/posts/:postId/comments`- GET all comments of that Post
+- `/posts/:postId/comments`- POST method for commenting on a Post
+- `/comment/:id`- DELETE method for deleting the comment
 
 
 
