@@ -9,6 +9,7 @@ npm install -D nodemon
 npm install mongoose
 npm install -D dotenv
 npm install mocha chai --save-dev
+npm install bcryptjs cors jsonwebtoken
 ```
 
 ## package.json Configuration
@@ -22,6 +23,10 @@ npm install mocha chai --save-dev
 - Run tests with `npm run test` or `npm test`
 - Change `"type": "commonjs"` to `"type": "module"` to use ES module syntax (`import`/`export`) instead of CommonJS (`require`)
 - Create a `.env` file to store credentials and secrets
+
+- `jsonwebtoken`- for later login and register
+- `cors` - communication between fornt end and backend 
+- `bcrypt` - for encrupting the user password
 
 ### Testing Stack
 - **mocha** — the test runner (engine running the test)
