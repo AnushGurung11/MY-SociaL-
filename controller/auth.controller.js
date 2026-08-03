@@ -1,6 +1,11 @@
-import authService from "../services/authService.js";
+import { register, login } from "../services/authService.js";
 
-export const register = async (req, res) => {
-  const result = await authService.register(req.body);
+export const registerUserController = async (req, res) => {
+  const result = await register(req.body);
+  res.status(result.status).json(result);
+};
+
+export const loginUserController = async (req, res) => {
+  const result = await login(req.body);
   res.status(result.status).json(result);
 };

@@ -67,7 +67,7 @@ userSchema.pre("save", async function () {
 });
 
 // This is a method for this class where it will checked the provied password and compare to the exisiting password
-userSchema.methods.matchPassword = async function (enteredPassword) {
+userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
