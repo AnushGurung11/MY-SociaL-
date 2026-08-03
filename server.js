@@ -1,6 +1,9 @@
-require("dotenv").config(); // for accessing the env variables
 import express from "express"; // for creating the server
 import cors from "cors"; // communication establishing between frontend and backend.
+import dotenv from "dotenv"; // for loading environment variables from a .env file
+import { authRouter } from "./routes/authRoutes.js"; // importing the auth routes
+
+dotenv.config(); // loading environment variables from .env file
 
 const app = express(); // creating the express server
 app.disable("x-powered-by"); // disabling the x-powered-by header for security reasons
@@ -17,7 +20,7 @@ app.use(cors(corsConfig)); // enabling CORS for all routes
 app.use(express.json()); // for parsing application/json
 
 // These are the routes setted up
-app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/auth", authRouter);
 // app.use("/api/users", require("./routes/userRoutes"));
 // app.use("/api/posts", require("./routes/postRoutes"));
 // app.use("/api/comments", require("./routes/commentRoutes"));
