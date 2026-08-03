@@ -1,21 +1,25 @@
 import User from "../models/user.model.js";
 import { generateToken } from "../utils/token.js";
 
-export const register = async (req, res) => {
+export const register = async (userData) => {
   try {
-    const { username, email, phone, DOB, password } = req.body;
+    const { username, email, phone, DOB, password } = userData;
 
     // first checking of any empty fields
     if (!username || !email || !DOB || !password) {
-      return res
-        .status(400)
-        .json({ message: "Please fill in all required fields" });
+      return {
+        status: 400,
+        message: "Please fill in all required fields",
+      };
     }
 
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return {
+        status: 400,
+        message: "User already exists",
+      };
     }
 
     // Create a new user in database
@@ -28,7 +32,8 @@ export const register = async (req, res) => {
     });
 
     // Json response for a newly registered user with a status code of 201
-    res.status(201).json({
+    return {
+      status: 201,
       message: "User registered successfully",
       user: {
         _id: newUser._id,
@@ -38,35 +43,51 @@ export const register = async (req, res) => {
         DOB: newUser.DOB,
         role: newUser.role,
       },
-    });
+    };
   } catch (error) {
     console.error("Error registering user:", error);
-    res.status(500).json({ message: "Internal server error" });
+    return {
+      status: 500,
+      message: "Internal server error",
+    };
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (userData) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = userData;
+
+    console.log(email);
+    console.log(password);
 
     // Checking for any empty fields
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Please fill in all required fields" });
+      return {
+        status: 400,
+        message: "Please fill in all required fields",
+      };
     }
 
     // Check if the user exists
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email }).select("+password");
+    console.log(userExists);
 
     if (!userExists) {
-      return res.status(400).json({ message: "User does not exist" });
+      return {
+        status: 400,
+        message: "User does not exist",
+      };
     }
 
     // Check if the password is correct
     const isPasswordCorrect = await userExists.comparePassword(password);
+    console.log(isPasswordCorrect);
+
     if (!isPasswordCorrect) {
-      return res.status(400).json({ message: "Invalid password" });
+      return {
+        status: 400,
+        message: "Invalid password",
+      };
     }
 
     // If the password is correct, then we generate a token for the user
@@ -77,9 +98,14 @@ export const login = async (req, res) => {
       role: userExists.role,
     };
 
+    console.log(payload);
+
     const token = generateToken(payload);
 
-    res.status(200).json({
+    console.log(token);
+
+    return {
+      status: 200,
       message: "User logged in successfully",
       user: {
         _id: userExists._id,
@@ -90,9 +116,12 @@ export const login = async (req, res) => {
         role: userExists.role,
       },
       token,
-    });
+    };
   } catch (error) {
     console.error("Error logging in user:", error);
-    res.status(500).json({ message: "Internal server error" });
+    return {
+      status: 500,
+      message: "Internal server error",
+    };
   }
 };
