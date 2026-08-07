@@ -11,7 +11,7 @@ app.disable("x-powered-by"); // disabling the x-powered-by header for security r
 
 // configiring cors to allow requests from the frontend
 const corsConfig = {
-  origin: "http://localhost:4000",
+  origin: `http://localhost:${process.env.PORT}`,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,

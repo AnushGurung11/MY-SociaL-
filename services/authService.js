@@ -1,9 +1,13 @@
-import User from "../models/user.model.js";
 import { generateToken } from "../utils/token.js";
+import {
+  createUser,
+  loginExistingUser,
+  existingUser,
+} from "../repository/userRepository.js";
 
 export const register = async (userData) => {
   try {
-    const { username, email, phone, DOB, password } = userData;
+    const { username, email, DOB, password } = userData;
 
     // first checking of any empty fields
     if (!username || !email || !DOB || !password) {
@@ -14,8 +18,9 @@ export const register = async (userData) => {
     }
 
     // Check if the user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    const checkExistingUser = await existingUser(email);
+
+    if (checkExistingUser != null) {
       return {
         status: 400,
         message: "User already exists",
@@ -23,13 +28,7 @@ export const register = async (userData) => {
     }
 
     // Create a new user in database
-    const newUser = await User.create({
-      username,
-      email,
-      phone,
-      DOB,
-      password,
-    });
+    const newUser = await createUser(userData);
 
     // Json response for a newly registered user with a status code of 201
     return {
@@ -69,10 +68,10 @@ export const login = async (userData) => {
     }
 
     // Check if the user exists
-    const userExists = await User.findOne({ email }).select("+password");
+    const userExists = await loginExistingUser(email);
     console.log(userExists);
 
-    if (!userExists) {
+    if (userExists == null) {
       return {
         status: 400,
         message: "User does not exist",
