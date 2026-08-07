@@ -3,15 +3,17 @@ import cors from "cors"; // communication establishing between frontend and back
 import dotenv from "dotenv"; // for loading environment variables from a .env file
 import { authRouter } from "./routes/authRoutes.js"; // importing the auth routes
 import { connectDB } from "./config/dbConfig.js"; // importing the database connection function
+import cookieParser from "cookie-parser";
 
 dotenv.config(); // loading environment variables from .env file
 
 const app = express(); // creating the express server
+app.use(cookieParser());
 app.disable("x-powered-by"); // disabling the x-powered-by header for security reasons
 
 // configiring cors to allow requests from the frontend
 const corsConfig = {
-  origin: `http://localhost:${process.env.PORT}`,
+  origin: process.env.CLIENT_URL || `http://localhost:${process.env.PORT}`,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
