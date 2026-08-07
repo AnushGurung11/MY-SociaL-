@@ -56,9 +56,6 @@ export const login = async (userData) => {
   try {
     const { email, password } = userData;
 
-    console.log(email);
-    console.log(password);
-
     // Checking for any empty fields
     if (!email || !password) {
       return {
@@ -69,7 +66,6 @@ export const login = async (userData) => {
 
     // Check if the user exists
     const userExists = await loginExistingUser(email);
-    console.log(userExists);
 
     if (userExists == null) {
       return {
@@ -80,7 +76,6 @@ export const login = async (userData) => {
 
     // Check if the password is correct
     const isPasswordCorrect = await userExists.comparePassword(password);
-    console.log(isPasswordCorrect);
 
     if (!isPasswordCorrect) {
       return {
@@ -94,14 +89,11 @@ export const login = async (userData) => {
     //first creating a payload for the token which will be used to generate the token
     const payload = {
       userID: userExists._id,
+      email: userExists.email,
       role: userExists.role,
     };
 
-    console.log(payload);
-
     const token = generateToken(payload);
-
-    console.log(token);
 
     return {
       status: 200,
@@ -123,4 +115,8 @@ export const login = async (userData) => {
       message: "Internal server error",
     };
   }
+};
+
+export const logout = async () => {
+  return { status: 200, message: "User logged out successfully" };
 };
