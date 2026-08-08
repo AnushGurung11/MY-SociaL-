@@ -31,8 +31,8 @@ app.use("/api/auth", authRouter);
 const PORT = process.env.PORT; // setting up the port for the server
 const DBURL = process.env.MONGO_URI; // importing the database connection function
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  // eslint-disable-line no-unused-vars
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
