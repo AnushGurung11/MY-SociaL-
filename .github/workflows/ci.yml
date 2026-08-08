@@ -1,4 +1,4 @@
-name: Express Backend CI/CD
+name: CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  build-test-and-notify:
+  build-and-test:
     runs-on: ubuntu-latest
 
     strategy:
@@ -16,26 +16,62 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{matrix.node-version}}
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
       - name: Lint
+        id: lint
+        continue-on-error: true
         run: npm run lint
 
       - name: Test
+        id: test
+        continue-on-error: true
         run: npm test
+
+      - name: Fail job if any step failed
+        if: steps.lint.outcome == 'failure' || steps.test.outcome == 'failure'
+        run: exit 1
 
       - name: Notify Discord
         if: always()
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          LINT_OUTCOME: ${{ steps.lint.outcome }}
+          TEST_OUTCOME: ${{ steps.test.outcome }}
         run: |
-          STATUS="${{ job.status }}"
-          if [ "$STATUS" = "success" ]; then COLOR=3066993; else COLOR=15158332; fi
-          curl -H "Content-Type: application/json" -X POST -d "{\"embeds\": [{\"title\": \"CI Build\", \"description\": \"Build finished with status: $STATUS\", \"color\": $COLOR}]}" "$DISCORD_WEBHOOK"
+          if [ "${{ job.status }}" = "success" ]; then
+            COLOR=3066993
+            STATUS_EMOJI="✅"
+          else
+            COLOR=15158332
+            STATUS_EMOJI="❌"
+          fi
+
+          COMMIT_SHA_SHORT=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          COMMIT_MSG=$(git log -1 --pretty=%s | sed 's/"/\\"/g')
+          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+          curl -H "Content-Type: application/json" -X POST -d "{
+            \"embeds\": [{
+              \"title\": \"${STATUS_EMOJI} CI Build - ${{ job.status }}\",
+              \"color\": ${COLOR},
+              \"fields\": [
+                { \"name\": \"Branch\", \"value\": \"${GITHUB_REF_NAME}\", \"inline\": true },
+                { \"name\": \"Commit\", \"value\": \"[${COMMIT_SHA_SHORT}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA})\", \"inline\": true },
+                { \"name\": \"Author\", \"value\": \"${COMMIT_AUTHOR}\", \"inline\": true },
+                { \"name\": \"Lint\", \"value\": \"${LINT_OUTCOME}\", \"inline\": true },
+                { \"name\": \"Test\", \"value\": \"${TEST_OUTCOME}\", \"inline\": true },
+                { \"name\": \"Message\", \"value\": \"${COMMIT_MSG}\" }
+              ],
+              \"url\": \"${RUN_URL}\"
+            }]
+          }" "$DISCORD_WEBHOOK"
