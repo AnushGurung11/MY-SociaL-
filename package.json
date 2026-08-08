@@ -20,7 +20,8 @@
   "scripts": {
     "test": "mocha",
     "dev": "nodemon server.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
