@@ -11,6 +11,6 @@ export default defineConfig([
   },
   {
     files: ["tests/**/*.js"],
-    languageOptions: { globals: globals.mocha },
+    languageOptions: { globals: globals.jest },
   },
 ]);
