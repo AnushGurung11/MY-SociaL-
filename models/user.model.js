@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       unique: true,
       required: true,
-      trim: true,
       auto: true,
     },
     username: {

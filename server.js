@@ -4,6 +4,7 @@ import dotenv from "dotenv"; // for loading environment variables from a .env fi
 import { authRouter } from "./routes/authRoutes.js"; // importing the auth routes
 import { connectDB } from "./config/dbConfig.js"; // importing the database connection function
 import cookieParser from "cookie-parser";
+import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 dotenv.config(); // loading environment variables from .env file
 
@@ -28,10 +29,12 @@ app.use("/api/auth", authRouter);
 // app.use("/api/posts", require("./routes/postRoutes"));
 // app.use("/api/comments", require("./routes/commentRoutes"));
 
+app.use(notFound);
+app.use(errorHandler);
+
 const PORT = process.env.PORT; // setting up the port for the server
 const DBURL = process.env.MONGO_URI; // importing the database connection function
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
