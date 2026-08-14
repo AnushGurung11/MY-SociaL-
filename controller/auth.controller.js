@@ -1,12 +1,13 @@
 import { register, login, logout } from "../services/authService.js";
+import { asynchandler } from "../utils/asyncHandler.js";
 
-export const registerUserController = async (req, res) => {
+export const registerUserController = asynchandler(async (req, res) => {
   const result = await register(req.body);
   const { status, ...body } = result;
   res.status(status).json(body);
-};
+});
 
-export const loginUserController = async (req, res) => {
+export const loginUserController = asynchandler(async (req, res) => {
   const result = await login(req.body);
   const { status, token, ...body } = result;
 
@@ -21,9 +22,9 @@ export const loginUserController = async (req, res) => {
   }
 
   res.status(status).json(body);
-};
+});
 
-export const logOutController = async (req, res) => {
+export const logOutController = asynchandler(async (req, res) => {
   const result = await logout();
   res.clearCookie("token", {
     httpOnly: true,
@@ -33,4 +34,4 @@ export const logOutController = async (req, res) => {
   });
 
   res.status(result.status).json(result);
-};
+});
