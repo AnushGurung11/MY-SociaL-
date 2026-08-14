@@ -1,5 +1,5 @@
-import { AppError } from "../error/appError";
-import { NotFoundError } from "../error/notFoundError";
+import { AppError } from "../error/appError.js";
+import { NotFoundError } from "../error/notFoundError.js";
 
 export const notFound = (req, res, next) => {
   next(new NotFoundError(`Route ${req.originalUrl} not found`));
