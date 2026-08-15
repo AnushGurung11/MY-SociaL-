@@ -4,18 +4,12 @@ import {
   loginExistingUser,
   existingUser,
 } from "../repository/userRepository.js";
-import { BadRequest } from "../error/badRequestError.js";
 import { ConflictError } from "../error/conflictError.js";
 import { UnauthenticatedError } from "../error/unauthenticatedError.js";
 import { NotFoundError } from "../error/notFoundError.js";
 
 export const register = async (userData) => {
-  const { username, email, DOB, password } = userData;
-
-  // first checking of any empty fields
-  if (!username || !email || !DOB || !password) {
-    throw new BadRequest("Input fields cannot be empty");
-  }
+  const { email } = userData;
 
   // Check if the user already exists
   const checkExistingUser = await existingUser(email);
@@ -36,7 +30,7 @@ export const register = async (userData) => {
       username: newUser.username,
       email: newUser.email,
       phone: newUser.phone,
-      DOB: newUser.DOB,
+      DOB: newUser.dob,
       role: newUser.role,
     },
   };
@@ -44,11 +38,6 @@ export const register = async (userData) => {
 
 export const login = async (userData) => {
   const { email, password } = userData;
-
-  // Checking for any empty fields
-  if (!email || !password) {
-    throw new BadRequest("Fields can not be empty");
-  }
 
   // Check if the user exists
   const userExists = await loginExistingUser(email);

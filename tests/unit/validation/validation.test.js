@@ -1,5 +1,9 @@
-import { registerSchema } from "../../../validation/auth.validation.js";
+import {
+  loginSchema,
+  registerSchema,
+} from "../../../validation/auth.validation.js";
 
+// testing for register Schema
 describe("registerSchema", () => {
   const valid = {
     username: "johnny",
@@ -13,6 +17,18 @@ describe("registerSchema", () => {
     expect(result.success).toBe(true);
     expect(result.data.email).toBe("john@example.com");
   });
+});
 
-  // ... rest identical to before, just with import instead of require
+// test case of login schema
+describe("loginSchema", () => {
+  const valid = {
+    email: "Jhon@Email.com",
+    password: "Pass12345",
+  };
+
+  test("accepts valid input", () => {
+    const result = loginSchema.safeParse(valid);
+    expect(result.success).toBe(true);
+    expect(result.data.email).toBe("jhon@email.com");
+  });
 });

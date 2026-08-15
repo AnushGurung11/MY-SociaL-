@@ -18,13 +18,12 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
-      match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
       required: true,
     },
     phone: {
       type: String,
     },
-    DOB: {
+    dob: {
       type: Date,
       required: true,
     },
