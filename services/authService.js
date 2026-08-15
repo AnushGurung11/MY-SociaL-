@@ -84,7 +84,7 @@ export const login = async (userData) => {
       username: userExists.username,
       email: userExists.email,
       phone: userExists.phone,
-      DOB: userExists.DOB,
+      DOB: userExists.dob,
       role: userExists.role,
     },
     token,
