@@ -1,5 +1,10 @@
 import { jest, expect, describe, beforeEach, it } from "@jest/globals";
 
+jest.unstable_mockModule("../../../config/dbConfig.js", () => ({
+  prisma: {},
+  connectDB: jest.fn(),
+}));
+
 jest.unstable_mockModule("../../../utils/token.js", () => ({
   verifyToken: jest.fn(),
 }));
