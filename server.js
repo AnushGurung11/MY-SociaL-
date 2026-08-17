@@ -1,8 +1,10 @@
 import express from "express"; // for creating the server
+import http from "http"; // for creating the http server (required by socket.io)
 import cors from "cors"; // communication establishing between frontend and backend.
 import dotenv from "dotenv"; // for loading environment variables from a .env file
 import { authRouter } from "./routes/authRoutes.js"; // importing the auth routes
 import { connectDB } from "./config/dbConfig.js"; // importing the database connection function
+import { initializeSocket } from "./config/socket.js"; // importing the socket.io setup
 import cookieParser from "cookie-parser";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
@@ -33,18 +35,15 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT; // setting up the port for the server
-const DBURL = process.env.MONGO_URI; // importing the database connection function
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Internal Server Error" });
-});
+// The socket.io server needs an http server instead of the express app directly
+const httpServer = http.createServer(app);
+initializeSocket(httpServer, corsConfig);
 
-app.listen(PORT, async () => {
+httpServer.listen(PORT, async () => {
   try {
-    await connectDB(DBURL).then(() => {
+    await connectDB().then(() => {
       console.log(`Server is running on port ${PORT}`);
-      console.log(`Connected to the database`);
     });
   } catch (error) {
     console.error("Error connecting to the database:", error);

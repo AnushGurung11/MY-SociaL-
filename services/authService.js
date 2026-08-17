@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/token.js";
 import {
   createUser,
@@ -9,7 +10,7 @@ import { UnauthenticatedError } from "../error/unauthenticatedError.js";
 import { NotFoundError } from "../error/notFoundError.js";
 
 export const register = async (userData) => {
-  const { email } = userData;
+  const { email, password, ...rest } = userData;
 
   // Check if the user already exists
   const checkExistingUser = await existingUser(email);
@@ -18,19 +19,27 @@ export const register = async (userData) => {
     throw new ConflictError("User Already Exist");
   }
 
+  // Hash the password before storing it (Prisma has no pre-save hooks)
+  const saltRound = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRound);
+
   // Create a new user in database
-  const newUser = await createUser(userData);
+  const newUser = await createUser({
+    ...rest,
+    email,
+    password: hashedPassword,
+  });
 
   // Json response for a newly registered user with a status code of 201
   return {
     status: 201,
     message: "User registered successfully",
     user: {
-      _id: newUser._id,
+      id: newUser.id,
       username: newUser.username,
       email: newUser.email,
       phone: newUser.phone,
-      DOB: newUser.dob,
+      dob: newUser.dob,
       role: newUser.role,
     },
   };
@@ -47,7 +56,7 @@ export const login = async (userData) => {
   }
 
   // Check if the password is correct
-  const isPasswordCorrect = await userExists.comparePassword(password);
+  const isPasswordCorrect = await bcrypt.compare(password, userExists.password);
 
   if (!isPasswordCorrect) {
     throw new UnauthenticatedError("Invalid Login Detail");
@@ -57,7 +66,7 @@ export const login = async (userData) => {
 
   //first creating a payload for the token which will be used to generate the token
   const payload = {
-    userID: userExists._id,
+    userID: userExists.id,
     email: userExists.email,
     role: userExists.role,
   };
@@ -69,11 +78,11 @@ export const login = async (userData) => {
     status: 200,
     message: "User logged in successfully",
     user: {
-      _id: userExists._id,
+      id: userExists.id,
       username: userExists.username,
       email: userExists.email,
       phone: userExists.phone,
-      DOB: userExists.dob,
+      dob: userExists.dob,
       role: userExists.role,
     },
     token,

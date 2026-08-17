@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  user
+  admin
+  moderator
+}
+
+enum ActiveStatus {
+  active
+  inactive
+  banned
+  deleted
+}
+
+enum Condition {
+  new
+  like_new
+  good
+  fair
+  poor
+}
+
+enum ListingStatus {
+  available
+  reserved
+  sold
+  archived
+}
+
+enum MediaType {
+  image
+  video
+}
+
+enum CommentStatus {
+  active
+  deleted
+}
+
+model User {
+  id            String       @id @default(uuid())
+  username      String
+  email         String       @unique
+  phone         String?
+  dob           DateTime
+  role          Role         @default(user)
+  avatar_key    String?
+  active_status ActiveStatus @default(active)
+  last_login    DateTime     @default(now())
+  bio           String?
+  location      String?
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  listings       Listing[]
+  comments       Comment[]
+  likes          Like[]
+  favorites      Favorite[]
+  conversationsA Conversation[] @relation("ConversationUserA")
+  conversationsB Conversation[] @relation("ConversationUserB")
+  messages       Message[]
+
+  @@map("users")
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  slug     String    @unique
+  listings Listing[]
+
+  @@map("categories")
+}
+
+model Listing {
+  id             String        @id @default(uuid())
+  seller_id      String
+  title          String
+  description    String
+  original_price Decimal       @db.Decimal(12, 2)
+  current_price  Decimal       @db.Decimal(12, 2)
+  condition      Condition
+  category_id    String
+  location       String
+  status         ListingStatus @default(available)
+  is_sponsored   Boolean       @default(false)
+  view_count     Int           @default(0)
+  deleted_at     DateTime?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  seller  User           @relation(fields: [seller_id], references: [id])
+  category Category      @relation(fields: [category_id], references: [id])
+  media   ListingMedia[]
+  comments Comment[]
+  likes   Like[]
+  favorites Favorite[]
+  messages Message[]
+
+  @@map("listings")
+}
+
+model ListingMedia {
+  id         String    @id @default(uuid())
+  listing_id String
+  media_type MediaType
+  position   Int
+  created_at DateTime  @default(now())
+
+  listing Listing @relation(fields: [listing_id], references: [id])
+
+  @@map("listing_media")
+}
+
+model Comment {
+  id          String        @id @default(uuid())
+  listing_id  String
+  user_id     String
+  description String
+  status      CommentStatus @default(active)
+  created_at  DateTime      @default(now())
+
+  listing Listing @relation(fields: [listing_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+
+  @@map("comments")
+}
+
+model Like {
+  listing_id String
+  user_id    String
+  created_at DateTime @default(now())
+
+  listing Listing @relation(fields: [listing_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+
+  @@id([listing_id, user_id])
+  @@map("likes")
+}
+
+model Favorite {
+  user_id    String
+  listing_id String
+  created_at DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id])
+  listing Listing @relation(fields: [listing_id], references: [id])
+
+  @@id([user_id, listing_id])
+  @@map("favorites")
+}
+
+model Conversation {
+  id         String   @id @default(uuid())
+  user_a_id  String
+  user_b_id  String
+  created_at DateTime @default(now())
+
+  userA    User      @relation("ConversationUserA", fields: [user_a_id], references: [id])
+  userB    User      @relation("ConversationUserB", fields: [user_b_id], references: [id])
+  messages Message[]
+
+  @@unique([user_a_id, user_b_id])
+  @@map("conversations")
+}
+
+model Message {
+  id              String    @id @default(uuid())
+  conversation_id String
+  sender_id       String
+  listing_id      String
+  content         String
+  media_key       String?
+  read_at         DateTime?
+  created_at      DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversation_id], references: [id])
+  sender       User         @relation(fields: [sender_id], references: [id])
+  listing      Listing      @relation(fields: [listing_id], references: [id])
+
+  @@map("messages")
+}
